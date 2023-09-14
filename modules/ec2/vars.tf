@@ -13,3 +13,7 @@ variable "ec2_instances" {
 variable "ami" {
     default = "ami-053b0d53c279acc90"
 }
+
+variable "subnet_id" {
+  description = "Subnet ID where EC2 instances should be launched."
+}
