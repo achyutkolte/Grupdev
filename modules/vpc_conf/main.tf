@@ -11,8 +11,9 @@ terraform {
 provider "aws" {
     region = var.region
 }
+
 module "vpc1" {
-  source   = "../modules/vpc"
+  source   = "../../modules/vpc"
   vpc_name = "myvpc"
   vpc_cidr = "10.0.0.0/16"
   subnets  = {
@@ -31,6 +32,31 @@ module "vpc1" {
       availability_zone = "us-east-1c"
       type              = "database"
     },
+  }
+}
+
+
+module "ec2_instances" {
+  source = "../../modules/ec2"
+
+  ec2_instances = {
+    public_instance = {
+      name              = "PublicInstance"
+      instance_type     = "t2.micro"
+      subnet_id         = module.vpc1.subnet_id                             # "aws_subnet.public.id" # Public subnet ID
+      key_name          = "public_key"
+      user_data         = "#!/bin/bash\necho 'Hello from public instance'"
+      associate_public_ip_address = true
+    }
+
+    private_instance = {
+      name              = "PrivateInstance"
+      instance_type     = "t2.micro"
+      subnet_id         = module.vpc1.subnet_id                                            # "aws_subnet.private.id" # Private subnet ID
+      key_name          = "private_key"
+      user_data         = "#!/bin/bash\necho 'Hello from private instance'"
+      associate_public_ip_address = false
+    }
   }
 }
 
